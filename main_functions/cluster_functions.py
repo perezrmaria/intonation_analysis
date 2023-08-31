@@ -10,7 +10,7 @@ from tslearn.clustering import KShape
 # Clustering and formatting for tslearn functions
 def cluster_and_plot(X, num_clusters=10, max_iter=250, random_state=42, num_samples ='25 to 35 samples'):
     """
-    This function takes the data and the number of clusters and returns the clusters.
+    This function takes the data and the number of clusters and returns and plots the clusters.
     """
     kshape = KShape(n_clusters=num_clusters, max_iter=max_iter, random_state=random_state)
     kshape.fit(X)
@@ -43,7 +43,7 @@ def cluster_distribution(y_pred):
 
 def formatting_all_info(all_info_method, max_num_samples=180, min_num_samples=509):    
     """
-    This function takes a dictionary with the pitch bend values for each note and returns a formatted array.
+    This function takes a dictionary with the pitch bend time series for each note and returns a formatted array of pitch bends.
     """
     list_of_lists = []
     list_more_than25 = []
