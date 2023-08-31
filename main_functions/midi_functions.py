@@ -60,7 +60,8 @@ def look_longest_notes(midi_data):
 
 def pitch_bend_to_cents(pitch_bend_value):
     """
-    This function takes a pitch bend value and returns the corresponding pitch bend in cents.
+    This function takes a pitch bend value 
+    and returns the corresponding pitch bend in cents.
     """
     pitch_bend_value += 8192
     cents = (pitch_bend_value - 8192) / 8192 * 100
@@ -68,8 +69,11 @@ def pitch_bend_to_cents(pitch_bend_value):
 
 def create_dic_all_method(main_folder, low_duration = 0, high_duration = 1000):
     """
-    This function takes a folder with midi files and returns a dictionary with the pitch bend values for each note.
-    It diferenciates into short and long notes automatically following the duration parameters defined in the master thesis memory.
+    This function takes a folder with midi files 
+    and returns a dictionary with the pitch bend and time values for each note, separated into short and long.
+    It diferenciates into short and long notes automatically 
+    following the duration parameters defined in the master thesis memory.
+    It also returns the length of every midi.
     """
     all_info_method = {}
     all_time_method = {}
@@ -105,7 +109,7 @@ def create_dic_all_method(main_folder, low_duration = 0, high_duration = 1000):
 
                     for note in notes_df.itertuples():
                         pitch_bends_in_longest_note = [event for event in all_pitch_bends_one_mid if note.start_time <= event.time < note.end_time]
-                        #sort pitch bend events by time
+
                         pitch_bends_in_longest_note = sorted(pitch_bends_in_longest_note, key=lambda event: event.time, reverse=False)
                         pitch_bend_times = [event.time for event in pitch_bends_in_longest_note]
                         pitch_bend_values = [event.pitch for event in pitch_bends_in_longest_note]
@@ -119,7 +123,7 @@ def create_dic_all_method(main_folder, low_duration = 0, high_duration = 1000):
                         my_time = list(pitch_bend_times)
                         len_mysignal.append(len(my_signal))
 
-                        # diference between short and long notes
+                        # diference between short and long notes (by following the score)
                         if note.Index == notes_df.index[-1]:
                             dic_long_final_notes[note.Index] = my_signal
                             dic_long_final_times[note.Index] = my_time
@@ -138,8 +142,10 @@ def create_dic_all_method(main_folder, low_duration = 0, high_duration = 1000):
 
 def create_dic_all_method_original(main_folder, low_duration = 0 , high_duration = 1000):
     """
-    This function takes a folder with midi files and returns a dictionary with the pitch bend values for each note.
-    It diferenciates into short and long notes following the duration parameters of low and high duration.
+    This function takes a folder with midi files 
+    and returns a dictionary with the pitch bend values for each note.
+    It diferenciates into short and long notes following 
+    the duration parameters of low and high duration.
     """
     all_info_method = {}
     all_time_method = {}
@@ -197,7 +203,9 @@ def create_dic_all_method_original(main_folder, low_duration = 0 , high_duration
 
 def formatting_all_info(all_info_method, max_num_samples=180, min_num_samples=509):    
     """
-    This function takes a dictionary with the pitch bend values for each note and returns a formatted array.
+    For clustering
+    This function takes a dictionary with the pitch bend values for each note 
+    and returns a formatted array.
     """
     list_of_lists = []
     list_more_than25 = []
@@ -237,20 +245,20 @@ def formatting_all_info(all_info_method, max_num_samples=180, min_num_samples=50
     X = np.reshape(X, (X.shape[0], X.shape[1], 1))
     print('Shape after formatting',X.shape)
     return X
-
+# Conversion details from grades to notes for all studied tonalities
 gradestoNote_C_Maj = {'I':'C', 'II':'D', 'III':'E', 'IV':'F', 'V':'G', 'VI':'A', 'VII':'B'}
 gradestoNote_G_Maj = {'I':'G', 'II':'A', 'III':'B', 'IV':'C', 'V':'D', 'VI':'E', 'VII':'F#'}
 gradestoNote_F_Maj = {'I':'F', 'II':'G', 'III':'A', 'IV':'A#', 'V':'C', 'VI':'D', 'VII':'E'}
 gradestoNote_Eb_Maj = {'I':'D#', 'II':'F', 'III':'G', 'IV':'G#', 'V':'A#', 'VI':'C', 'VII':'D'}
 gradestoNote_A_Maj = {'I':'A', 'II':'B', 'III':'C#', 'IV':'D', 'V':'E', 'VI':'F#', 'VII':'G#'}
-
+# Conversion details from notes to grades for all studied tonalities
 notetoGrades_C_Maj = {'C':'I', 'D':'II', 'E':'III', 'F':'IV', 'G':'V', 'A':'VI', 'B':'VII'}
 notetoGrades_G_Maj = {'G':'I', 'A':'II', 'B':'III', 'C':'IV', 'D':'V', 'E':'VI', 'F#':'VII'}
 notetoGrades_F_Maj = {'F':'I', 'G':'II', 'A':'III', 'A#':'IV', 'C':'V', 'D':'VI', 'E':'VII'}
 notetoGrades_Eb_Maj = {'D#':'I', 'F':'II', 'G':'III', 'G#':'IV', 'A#':'V', 'C':'VI', 'D':'VII'}
 notetoGrades_A_Maj = {'A':'I', 'B':'II', 'C#':'III', 'D':'IV', 'E':'V', 'F#':'VI', 'G#':'VII'}
 
-
+# Relationships between etudes and tonalities
 tonalities = {'C':notetoGrades_C_Maj, 'G':notetoGrades_G_Maj, 'F':notetoGrades_F_Maj, 'Eb':notetoGrades_Eb_Maj, 'A':notetoGrades_A_Maj}
 tonalities_etudes = {'Wohlfahrt-Op45-01': 'C', 'Wohlfahrt-Op45-03': 'G', 'Wohlfahrt-Op45-05': 'F', 'Wohlfahrt-Op45-10': 'A', 'Wohlfahrt-Op45-11': 'Eb', 'Wohlfahrt-Op45-15': 'C', 'Wohlfahrt-Op45-26': 'G'}
 tonalities_etudes_no26 = {'Wohlfahrt-Op45-01': 'C', 'Wohlfahrt-Op45-03': 'G', 'Wohlfahrt-Op45-05': 'F', 'Wohlfahrt-Op45-10': 'A', 'Wohlfahrt-Op45-11': 'Eb', 'Wohlfahrt-Op45-15': 'C'}
