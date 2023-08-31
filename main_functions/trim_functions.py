@@ -11,7 +11,8 @@ def midi_work(midi_file, plot_yes=True, chroma=True, df_sub=False):
     If plot is True, a plot is created.
     If chroma is True, the DataFrame is also created for the chroma.
     If df_sub is True, a DataFrame is created for all notes between C3 and C5 
-    (df_sub is specially for Paganini scores where much higher notes are played)."""
+    (df_sub is specially for Paganini scores where much higher notes are played).
+    """
     pitch = 0
     dict_instrument = {}
     dict_instrument_chroma = {}
@@ -56,7 +57,8 @@ def midi_work(midi_file, plot_yes=True, chroma=True, df_sub=False):
 
 def folder_work(folder_path, chroma=True, sub=False, return_yes = True, plot_yes=True):
     """Returns a DataFrame with mean and standard deviation for each note in a folder.
-    The DataFrame is ordered by note name."""
+    The DataFrame is ordered by note name.
+    """
 
     df = pd.DataFrame()
     df_chroma = pd.DataFrame()
@@ -69,7 +71,6 @@ def folder_work(folder_path, chroma=True, sub=False, return_yes = True, plot_yes
         player = piece.split("_")[2]
 
         df_piece, df_chroma_piece, df_sub_piece = midi_work(folder_path + '/' + piece, plot_yes=plot_yes, chroma=chroma, df_sub=sub)
-        # append data to df_player_note
         df = migrate_def(df_piece, df, player)
         order_df_by_note_name(df)
         if chroma:
