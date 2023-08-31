@@ -76,9 +76,10 @@ def filter_and_display(initial_dict, key_pattern, plot_yes=False):
 
 def df_all_players_etude(filtered_dict_tonalities, df_dict, plot_yes = False):
     """
+    For short notes!
     This function takes a dictionary with the filtered tonalities and a dictionary with the dataframes of the players.
     It merges the pitch bend value information and the info dataframe of the players.
-    It returns a dataframe with the pitch bend values of all the players.
+    It returns a dataframe with the pitch bend values of all the players and midi info of all notes.
     """
     names_new_columns = []
     player_value = pd.DataFrame()
@@ -97,7 +98,38 @@ def df_all_players_etude(filtered_dict_tonalities, df_dict, plot_yes = False):
         display(merged_df.head(25))
     return merged_df, names_new_columns
 
+def df_all_players_etude_long_notes(filtered_dict_eb_n11, pdf_dict_long, plot_yes=False):
+    """
+    For long notes!
+    This function takes a dictionary with the filtered tonalities and a dictionary with the dataframes of the players.
+    It merges the pitch bend value information and the info dataframe of the players.
+    It returns a dataframe with the pitch bend values of all the players and midi info of the notes.
+    """
+    names_new_columns = []
+    player_value = pd.DataFrame()
+    for key, value in filtered_dict_eb_n11.items():
+        data_dict = filtered_dict_eb_n11[key]
+        last_part = key.split('-')[-1]
+        column_name = str('pitchValue'+'_'+last_part)
+        names_new_columns.append(column_name)
+        filtered_dict_tonalities_df = pd.DataFrame.from_dict(data_dict, orient='index', columns=[column_name])
+        player_value = pd.concat([player_value, filtered_dict_tonalities_df], axis=1)
+
+    rafferty_df = pdf_dict_long[key]
+    characteristics_df = pd.DataFrame()
+    for key, thing in rafferty_df.items():
+        characteristics_df[key] = [thing]
+    merged_df = pd.concat([characteristics_df, player_value.reset_index()],  axis=1)
+    if plot_yes:
+        display(merged_df)
+    return merged_df, names_new_columns
+
 def see_heatmap_zero_tonic(main_table, direction, overall_coverage_mean):
+    """
+    This function takes the main intonation deviation from 12-TET table and generates a coloured heatmap.
+    It displays both the table without(left) and with (right) tonic normalization.
+    Tonic normalization consists on substracting the value of the tonic (I) to the other scale degrees.
+    """
     pdf_to_see_1 = main_table.T
 
     colors = ["darkblue", "white", "darkred"] 
@@ -121,6 +153,7 @@ def see_heatmap_zero_tonic(main_table, direction, overall_coverage_mean):
 
 def define_direction_in_df(merged_df):
     """
+    For Backwards Direction!
     This function takes a dataframe and returns the dataframe with the direction of the pitch bend values.
     """
     current_pitch = 0
@@ -144,6 +177,10 @@ def define_direction_in_df(merged_df):
     return merged_df
 
 def define_next_direction_in_df(merged_df):
+    """
+    For Forwards Direction!
+    This function takes a dataframe and returns the dataframe with the direction of the pitch bend values.
+    """
     current_pitch = 0
     past_pitch = 0
     merged_df['pitch'] = merged_df['pitch'].apply(pretty_midi.note_name_to_number)
@@ -167,6 +204,10 @@ def define_next_direction_in_df(merged_df):
     return merged_df
 
 def define_2before_direction_in_df(merged_df):
+    """
+    For Backwards Direction, taking into account TWO notes before the goal note!
+    This function takes a dataframe and returns the dataframe with the direction of the pitch bend values.
+    """
     current_pitch = 0
     past_pitch = 0
     merged_df['pitch'] = merged_df['pitch'].apply(pretty_midi.note_name_to_number)
@@ -208,31 +249,13 @@ def define_2before_direction_in_df(merged_df):
     merged_df['pitch'] = merged_df['pitch'].apply(pretty_midi.note_number_to_name)
     return merged_df
 
-def df_all_players_etude_long_notes(filtered_dict_eb_n11, pdf_dict_long, plot_yes=False):
-    names_new_columns = []
-    player_value = pd.DataFrame()
-    for key, value in filtered_dict_eb_n11.items():
-        data_dict = filtered_dict_eb_n11[key]
-        last_part = key.split('-')[-1]
-        column_name = str('pitchValue'+'_'+last_part)
-        names_new_columns.append(column_name)
-        filtered_dict_tonalities_df = pd.DataFrame.from_dict(data_dict, orient='index', columns=[column_name])
-        player_value = pd.concat([player_value, filtered_dict_tonalities_df], axis=1)
-
-    rafferty_df = pdf_dict_long[key]
-    characteristics_df = pd.DataFrame()
-    for key, thing in rafferty_df.items():
-        characteristics_df[key] = [thing]
-    merged_df = pd.concat([characteristics_df, player_value.reset_index()],  axis=1)
-    if plot_yes:
-        display(merged_df)
-    return merged_df, names_new_columns
 
 def get_mean_pitch_value(short_info_method_general, short_time_method_general):
   """
     For short notes (no vibrato)
-    This function takes a dictionary with the pitch bend values for each note and returns a dictionary with the mean pitch bend value for each note.
-    """
+    This function takes a dictionary with the pitch bend values for each note 
+    and returns a dictionary with the mean pitch bend value, the stabilized values, stabilized time and coverage for each note.
+  """
   pshort_stabilized_values = {}
   pshort_stabilized_time = {}
   pshort_main_pitch_value = {}
@@ -272,7 +295,9 @@ def get_mean_pitch_value(short_info_method_general, short_time_method_general):
 def long_get_mean_pitch_value(long_final_notes, long_final_times, plot_yes=False):
     """
     For long notes (vibrato)
-    This function takes a dictionary with the pitch bend values for each note and returns a dictionary with the mean pitch bend value for each note.
+    This function takes a dictionary with the pitch bend values for each note 
+    and returns a dictionary with the mean pitch bend value the stabilized values, 
+    stabilized time and coverage for each note.
     """
     pshort_stabilized_values = {}
     pshort_stabilized_time = {}
@@ -326,7 +351,8 @@ def long_get_mean_pitch_value(long_final_notes, long_final_times, plot_yes=False
 def get_midi_info_dict(main_folder= '/content/drive/Shareddrives/Master Thesis/iter1_midi/wohlfahrt_first_30_no_accidentals'):
     """
     Both short and long notes
-    This function takes a folder with midi files and returns a dictionary with the pitch bend midi information for each note.
+    This function takes a folder with midi files 
+    and returns a dictionary with the pitch bend midi information for each note.
     """
     pdf_dict_short = {}
     pdf_dict_long = {}
@@ -353,7 +379,8 @@ def get_midi_info_dict(main_folder= '/content/drive/Shareddrives/Master Thesis/i
 def see_main_int_tables(pshort_main_pitch_value, pdf_dict_short, overall_coverage_mean):
   """
     For short notes (no vibrato)
-    This function takes a dictionary with the pitch bend values for each note and returns a dictionary with the mean pitch bend value for each note.
+    This function takes a dictionary with the pitch bend values for each note and 
+    returns a dictionary with the mean pitch bend value for each note.
     The table of intonation deviation from 12-TET is calculated and displayed.
   """
   tonalities_etudes_notetoGrades = {'Wohlfahrt-Op45-01': {'C':'I', 'D':'II', 'E':'III', 'F':'IV', 'G':'V', 'A':'VI', 'B':'VII'}, 'Wohlfahrt-Op45-03': {'G':'I', 'A':'II', 'B':'III', 'C':'IV', 'D':'V', 'E':'VI', 'F#':'VII'}, 'Wohlfahrt-Op45-05': {'F':'I', 'G':'II', 'A':'III', 'A#':'IV', 'B':'IV#', 'C':'V', 'D':'VI', 'E':'VII'}, 'Wohlfahrt-Op45-10': {'A':'I', 'B':'II', 'C#':'III', 'D':'IV', 'E':'V', 'F#':'VI', 'G#':'VII'}, 'Wohlfahrt-Op45-11': {'D#':'I', 'F':'II', 'G':'III', 'G#':'IV', 'A':'#IV','A#':'V', 'C':'VI', 'D':'VII'}, 'Wohlfahrt-Op45-15': {'C':'I', 'D':'II', 'E':'III', 'F':'IV', 'G':'V', 'A':'VI', 'B':'VII'}, 'Wohlfahrt-Op45-26': {'G':'I', 'A':'II', 'B':'III', 'C':'IV', 'D':'V', 'E':'VI', 'F#':'VII'}}
@@ -420,7 +447,6 @@ def see_main_int_tables(pshort_main_pitch_value, pdf_dict_short, overall_coverag
       formatted_mean_values = mean_values_per_row.apply(lambda x: f"{x:.3f}")
       formatted_std_values = std_per_row.apply(lambda x: f"± {x:.3f}")
 
-      # Combine mean and std values with the desired format
       mean_std_combined = formatted_mean_values + ' ' + formatted_std_values
       other_table[current_tonality] = mean_std_combined
 
@@ -499,12 +525,7 @@ def long_see_main_int_tables(long_main_pitch_value, pdf_dict_long, overall_cover
         else:
             df_value_counts_tonality[current_tonality] = value_counts
 
-
-    #display(merged_df)
-
-    #print('Relationship between the number of notes per scale degree for all etudes and tonalities')
     sorted_df_value_counts = df_value_counts.sort_index()
-    #display(sorted_df_value_counts)
 
     columns_to_mean = [column for column in merged_df.columns if 'pitchValue' in column]
     mean_per_row = merged_df[columns_to_mean].mean(axis=1)
@@ -517,20 +538,25 @@ def long_see_main_int_tables(long_main_pitch_value, pdf_dict_long, overall_cover
     grouped_df = final_df.groupby(['tonality', 'note_grade']).mean()
     display('grouped_df', grouped_df)
 
-    colors = ["darkblue", "white", "darkred"]  # Define your colors here (from negative to positive)
-    n_bins = 100  # Number of bins in the colormap
+    colors = ["darkblue", "white", "darkred"]
+    n_bins = 100 
     cmap_name = "custom_cmap"
     cm = LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bins)
-
-    # Create a heatmap using seaborn with the custom colormap
     sns.heatmap(grouped_df.T, annot=True, cmap=cm, fmt='.2f', linewidths=0.5, center=0)
     plt.title(f'Mean intonation deviation /  {overall_coverage_mean:.2f} % coverage / long notes')
-    # Show the plot
     plt.show()
 
     return grouped_df, dict_df_value_count_players
 
 def direction_see_main_int_tables(pshort_main_pitch_value, pdf_dict_short, backwards=True, forward=False):
+    """
+    For short notes regarding Backwards Direction for Mean, Median and STD
+    The table of intonation deviation from 12-TET is calculated and displayed.
+    This function takes a dictionary with the pitch bend values and midi characteristics for each note and 
+    returns the intonation deviation table with the mean, median and STD pitch bend value for each note regarding backwards direction. 
+    Each plot will be displayed without(left) and with(right) tonic normalization.
+    
+    """
     tonalities_etudes_notetoGrades = {'Wohlfahrt-Op45-01': {'C':'I', 'D':'II', 'E':'III', 'F':'IV', 'G':'V', 'A':'VI', 'B':'VII'}, 'Wohlfahrt-Op45-03': {'G':'I', 'A':'II', 'B':'III', 'C':'IV', 'D':'V', 'E':'VI', 'F#':'VII'}, 'Wohlfahrt-Op45-05': {'F':'I', 'G':'II', 'A':'III', 'A#':'IV', 'B':'IV#', 'C':'V', 'D':'VI', 'E':'VII'}, 'Wohlfahrt-Op45-10': {'A':'I', 'B':'II', 'C#':'III', 'D':'IV', 'E':'V', 'F#':'VI', 'G#':'VII'}, 'Wohlfahrt-Op45-11': {'D#':'I', 'F':'II', 'G':'III', 'G#':'IV', 'A':'#IV','A#':'V', 'C':'VI', 'D':'VII'}, 'Wohlfahrt-Op45-15': {'C':'I', 'D':'II', 'E':'III', 'F':'IV', 'G':'V', 'A':'VI', 'B':'VII'}, 'Wohlfahrt-Op45-26': {'G':'I', 'A':'II', 'B':'III', 'C':'IV', 'D':'V', 'E':'VI', 'F#':'VII'}}
     tonalities_etudes = {'Wohlfahrt-Op45-01': 'C', 'Wohlfahrt-Op45-03': 'G', 'Wohlfahrt-Op45-05': 'F', 'Wohlfahrt-Op45-10': 'A', 'Wohlfahrt-Op45-11': 'Eb', 'Wohlfahrt-Op45-15': 'C', 'Wohlfahrt-Op45-26': 'G'}
 
@@ -726,9 +752,7 @@ def get_overall_coverage(pshort_coverage_dict):
     for key, inner_dict in pshort_coverage_dict.items():
         mean_values_by_key[key] = sum(inner_dict.values()) / len(inner_dict)
 
-    # Calcular la media general de todas las medias por clave
     overall_coverage_mean = sum(mean_values_by_key.values()) / len(mean_values_by_key)
 
-    #print("Mean per key:", mean_values_by_key)
     print(f"Overall mean: {overall_coverage_mean}")
     return overall_coverage_mean
