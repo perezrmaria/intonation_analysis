@@ -40,7 +40,7 @@ def find_frrt_frequency(signal, plot_yes=False):
 
 def frequency_from_peaks(peaks, limit):
     """
-    This function takes a list of peaks and returns the frequency of the vibrato.
+    This function takes a list of peaks and returns the frequency.
     Takes into account the sampling rate of the signal: 5.8 ms.
     """
     result = []
@@ -56,7 +56,8 @@ def frequency_from_peaks(peaks, limit):
 
 def find_peaks_and_interpolate(my_signal, my_time, name_part, limit=0, plot_yes=False):
     """
-    This function takes a signal and the time and returns the interpolated values of the signal.
+    This function takes a signal and the time and returns the interpolated values 
+    of the signal around the found positive and negativepeaks.
     It also returns the median of the interpolated values.
     """
     peaks_upp, _ = find_peaks(my_signal, prominence=1.5)
@@ -115,7 +116,8 @@ def find_peaks_and_interpolate(my_signal, my_time, name_part, limit=0, plot_yes=
 
 def model_vibrato_sinusoid(y, t, name_part, interpolated_values_upp, interpolated_values_down, rfft_frequency, phase_shift, plot_yes=False):
     """
-    This function takes a signal, the corresponding time series, frequency, phase shift and interpolated values and returns the sinusoid of the vibrato signal.
+    This function takes a signal, the corresponding time series, frequency, phase shift and interpolated values 
+    and returns the sinusoid of the vibrato signal.
     It also returns the mean, amplitude and frequency of the sinusoid.
     """
     mean = np.mean(y)
@@ -144,7 +146,8 @@ def model_vibrato_sinusoid(y, t, name_part, interpolated_values_upp, interpolate
 
 def model_time_varying_vibrato_sinusoid(y, t, name_part, mean, amplitude, rfft_frequency, phase_shift, plot_yes=False):
     """
-    This function takes a signal, time series, mean, amplitude, rFFT frequency and phase shift and returns the sinusoid of the time-varying vibrato signal.
+    This function takes a signal, time series, mean, amplitude, rFFT frequency and phase shift 
+    and returns the sinusoid of the time-varying vibrato signal.
     """
 
     freq_list = np.full_like(y, rfft_frequency)
@@ -168,7 +171,8 @@ def model_time_varying_vibrato_sinusoid(y, t, name_part, mean, amplitude, rfft_f
 
 def apply_lowpass_filter(input_signal, cutoff_frequency, sampling_frequency):
     """
-    This function takes a signal, the cutoff frequency and the sampling frequency and returns the filtered signal.
+    This function takes a signal, the cutoff frequency and the sampling frequency 
+    and returns the filtered signal.
     """
     nyquist_frequency = 0.5 * sampling_frequency
     normalized_cutoff = cutoff_frequency / nyquist_frequency
