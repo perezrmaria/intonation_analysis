@@ -26,7 +26,8 @@ def look_for_coverage(values, trimmed_values):
 
 def trim_by_peaks_prominence(values, time, plot_yes=True):
     """
-    This function takes the values of a signal and the time and returns the trimmed values and time.
+    This function takes the values of a signal and the time 
+    and returns the trimmed values and time, trimmed by the prominence of the peaks.
     It works via peaks and prominences.
     It also returns the coverage of the trimmed values.
     """
@@ -96,7 +97,7 @@ def calculate_slope(x1, y1, x2, y2):
 def trim_start_end_slope(values, time, window_size, threshold_slope, plot_yes=True, index_number=0):
     """
     This function takes the values of a signal, the time, the window size and the threshold slope.
-    It returns the stabilized values and time.
+    It returns the stabilized values and time after trimming the original signal by looking at the slope of its start and end.
     """
     stabilized_index_start = None
 
@@ -107,17 +108,15 @@ def trim_start_end_slope(values, time, window_size, threshold_slope, plot_yes=Tr
             stabilized_index_start = i + window_size
             break
 
-    # Find the negative slope at the end of the signal
     stabilized_index_end = None
     if stabilized_index_start is not None:
         for i in range(len(values) - window_size - 1, stabilized_index_start, -1):
             window_slope = calculate_slope(time[i - window_size], values[i - window_size], time[i], values[i])
             
             if window_slope > -threshold_slope:
-                stabilized_index_end = i - window_size + 1  # Include the current sample where the negative slope starts
+                stabilized_index_end = i - window_size + 1 
                 break
 
-    # Determine where the unexpected change occurs and trim the original signal accordingly
     if stabilized_index_end is not None:
         values_trimmed = values[stabilized_index_start:stabilized_index_end]
         time_trimmed = time[stabilized_index_start:stabilized_index_end]
@@ -132,7 +131,6 @@ def trim_start_end_slope(values, time, window_size, threshold_slope, plot_yes=Tr
         plt.ylabel('Values')
         plt.title(f'Original Time Series Wohlfahrt-Op45-26-ZYZ {index_number}')
 
-        # Plot the stabilized time series if found
         if stabilized_index_start is not None:
             plt.plot(time[stabilized_index_start:], values[stabilized_index_start:], 'r--', label='Stabilized Time Series (Start)')
             if stabilized_index_end is not None:
@@ -216,6 +214,7 @@ def hist_pitch_max(num_bins, stabilized_values, plot_yes=False):
     """
     This function takes the number of bins, the stabilized values and a boolean to plot the histogram.
     It returns the mean of the bins with the highest counts.
+    It converts a pitch bend time series into a single representing value.
     """
     max_value = -1
     i_anterior = 0
@@ -261,9 +260,7 @@ def hist_pitch_max(num_bins, stabilized_values, plot_yes=False):
 
     for bin_index in sorted_indices[:count_same_value]:
         sum_all_indexes += bins[bin_index]
-        #print('sum_all_indexes', sum_all_indexes)
     mean_all_indexes = sum_all_indexes / count_same_value 
-    #print('mean_all_indexes', mean_all_indexes)
 
     return mean_all_indexes
 
@@ -285,8 +282,6 @@ def calculate_peak_relative_energy(signal, plot_yes=False):
         frequency_range = (4, 10)
 
         indices_of_interest = np.where((x >= frequency_range[0]) & (x <= frequency_range[1]))
-
-        # Calculate the peak relative energy by summing the power spectrum values within the range
         peak_relative_energy = np.sum(power_spectrum[indices_of_interest])
         power_spectrum_db = 10 * np.log10(power_spectrum)
 
@@ -324,11 +319,14 @@ def look_energy_comparison(signal_data):
     return energy_comparison_ratio
 
 def draw_vibrato_plots(my_time, signal_interpolated, mean, amplitude):
+    """
+    This function takes the time and signal arrays of a pitch bend (usually with vibrato)
+    and displays the interpolated signals among their peaks, the mean value and amplitude
+    """
     plt.figure(figsize=(20, 10))
     plt.subplot(2, 1, 1)
     plt.plot(my_time, signal_interpolated, label='Signal (Interpolated)')
     plt.plot(my_time, mean, label='Mean', color='green')
-    #plt.plot(my_new_time, amplitude, label='Amplitude')
     plt.legend()
     plt.title("Interpolated Signal and Mean")
     plt.xlabel("Time (s)")
