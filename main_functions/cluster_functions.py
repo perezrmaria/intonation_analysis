@@ -12,13 +12,14 @@ def cluster_and_plot(X, num_clusters=10, max_iter=250, random_state=42, num_samp
     """
     This function takes the data and the number of clusters and returns and plots the clusters.
     """
-    kshape = KShape(n_clusters=num_clusters, max_iter=max_iter, random_state=random_state)
-    kshape.fit(X)
+    #kshape = KShape(n_clusters=num_clusters, max_iter=max_iter, random_state=random_state)
+    #kshape.fit(X)
+    #y_pred = kshape.predict(X)
 
-    print("Euclidean k-means")
     km = TimeSeriesKMeans(n_clusters=num_clusters, verbose=True, random_state=random_state)
     y_pred = km.fit_predict(X)
-
+    
+    print("Euclidean k-means")
     plt.figure(figsize=(20, 15))
     for yi in range(num_clusters):
         plt.subplot(5, int(num_clusters/5), yi + 1)
